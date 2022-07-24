@@ -5,6 +5,10 @@ import {
     signInWithRedirect,
     signInWithPopup,
     GoogleAuthProvider,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged,
 } from "firebase/auth";
 
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
@@ -28,27 +32,50 @@ provider.setCustomParameters({
 });
 export const auth = getAuth();
 export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
+export const signInWithGoogleRediect = () => signInWithRedirect(auth, provider);
 
 export const db = getFirestore();
 
-export const creactUserDocumentFromAuth = async (userAuth) => {
-    const userDocRef=doc(db,'users',userAuth.uid)
+export const creactUserDocumentFromAuth = async (
+    userAuth,
+    additionalInfo = {}
+) => {
+    const userDocRef = doc(db, "users", userAuth.uid);
     console.log(userDocRef);
-
-    const userSnapshot= await getDoc(userDocRef)
+    //只有这个函数能实际塞入数据库，其他都只是创建了一个未载入的数据
+    const userSnapshot = await getDoc(userDocRef);
     //不存在就创建一个
-    if(!userSnapshot.exists()){
-        const {displayName,email}=userAuth
-        const createdAt=new Date();
+    if (!userSnapshot.exists()) {
+        const { displayName, email } = userAuth;
+        const createdAt = new Date();
         try {
-            await setDoc(userDocRef,{
+            await setDoc(userDocRef, {
                 displayName,
                 email,
-                createdAt
-            })
+                createdAt,
+                ...additionalInfo,
+            });
         } catch (error) {
-            console.log('oh no !',error.message);
+            //捕获塞入数据时候的错误
+            console.log("oh no !", error.message);
         }
     }
-    return userDocRef
+    //存在（创建后）就返回一个引用
+    return userDocRef;
 };
+
+export const createAuthUserWithEmailAndPassword = async (email, password) => {
+    if (!email || !password) return;
+    return createUserWithEmailAndPassword(auth, email, password);
+};
+
+export const signInAuthUserWithEmailAndPassword = async (email, password) => {
+    if (!email || !password) return;
+    return signInWithEmailAndPassword(auth, email, password);
+};
+
+export const signOutUser = async () => await signOut(auth);
+export const onAuthStateChangedListener = (callback) =>{
+    return  onAuthStateChanged(auth, callback);
+}
+
