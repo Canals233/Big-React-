@@ -11,7 +11,16 @@ import {
     onAuthStateChanged,
 } from "firebase/auth";
 
-import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+import {
+    getFirestore,
+    doc,
+    getDoc,
+    setDoc,
+    collection,
+    writeBatch,
+    query,
+    getDocs
+} from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -35,6 +44,35 @@ export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
 export const signInWithGoogleRediect = () => signInWithRedirect(auth, provider);
 
 export const db = getFirestore();
+
+export const addCollectionAndDocuments = async (
+    collectionKey,
+    objectsToadd
+) => {
+    const collectionRef = collection(db, collectionKey);
+    const batch = writeBatch(db);
+    objectsToadd.forEach ((object) => {
+        const docRef = doc(collectionRef, object.title.toLowerCase());
+        batch.set(docRef, object);
+    });
+    const res=await batch.commit();
+    console.log('batch done',res);
+};
+
+export const getCategoriesAndDocuments = async ()=>{
+    const collectionRef = collection(db, 'categories');
+    const q=query(collectionRef)//通过集合引用查询
+    const querySnapshot=await getDocs(q)//这个数据将是集合里的所有数据
+    const categoriyMap=querySnapshot.docs.reduce((acc,docSnapshot)=>{
+        const {title,items}=docSnapshot.data()
+        acc[title.toLowerCase()]=items;
+        return acc
+    },{})
+
+    return categoriyMap
+}
+
+
 
 export const creactUserDocumentFromAuth = async (
     userAuth,
@@ -75,7 +113,6 @@ export const signInAuthUserWithEmailAndPassword = async (email, password) => {
 };
 
 export const signOutUser = async () => await signOut(auth);
-export const onAuthStateChangedListener = (callback) =>{
-    return  onAuthStateChanged(auth, callback);
-}
-
+export const onAuthStateChangedListener = (callback) => {
+    return onAuthStateChanged(auth, callback);
+};
