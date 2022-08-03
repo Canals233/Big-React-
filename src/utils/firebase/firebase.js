@@ -19,7 +19,7 @@ import {
     collection,
     writeBatch,
     query,
-    getDocs
+    getDocs,
 } from "firebase/firestore";
 
 // Your web app's Firebase configuration
@@ -40,7 +40,7 @@ provider.setCustomParameters({
     prompt: "select_account",
 });
 export const auth = getAuth();
-export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
+export const signInWithGooglePopup = () => signInWithPopup(auth, provider);//这里也是返回快照
 export const signInWithGoogleRediect = () => signInWithRedirect(auth, provider);
 
 export const db = getFirestore();
@@ -51,35 +51,27 @@ export const addCollectionAndDocuments = async (
 ) => {
     const collectionRef = collection(db, collectionKey);
     const batch = writeBatch(db);
-    objectsToadd.forEach ((object) => {
+    objectsToadd.forEach((object) => {
         const docRef = doc(collectionRef, object.title.toLowerCase());
         batch.set(docRef, object);
     });
-    const res=await batch.commit();
-    console.log('batch done',res);
+    const res = await batch.commit();
+    console.log("batch done", res);
 };
 
-export const getCategoriesAndDocuments = async ()=>{
-    const collectionRef = collection(db, 'categories');
-    const q=query(collectionRef)//通过集合引用查询
-    const querySnapshot=await getDocs(q)//这个数据将是集合里的所有数据
-    const categoriyMap=querySnapshot.docs.reduce((acc,docSnapshot)=>{
-        const {title,items}=docSnapshot.data()
-        acc[title.toLowerCase()]=items;
-        return acc
-    },{})
-
-    return categoriyMap
-}
-
-
+export const getCategoriesAndDocuments = async (collectionStr) => {
+    const collectionRef = collection(db, collectionStr);
+    const q = query(collectionRef); //通过集合引用查询
+    const querySnapshot = await getDocs(q); //这个数据将是集合里的所有数据
+    return querySnapshot.docs.map((docSnapshot) => docSnapshot.data());
+};
 
 export const creactUserDocumentFromAuth = async (
     userAuth,
     additionalInfo = {}
 ) => {
     const userDocRef = doc(db, "users", userAuth.uid);
-    console.log(userDocRef);
+
     //只有这个函数能实际塞入数据库，其他都只是创建了一个未载入的数据
     const userSnapshot = await getDoc(userDocRef);
     //不存在就创建一个
@@ -99,7 +91,7 @@ export const creactUserDocumentFromAuth = async (
         }
     }
     //存在（创建后）就返回一个引用
-    return userDocRef;
+    return userSnapshot;
 };
 
 export const createAuthUserWithEmailAndPassword = async (email, password) => {
@@ -115,4 +107,17 @@ export const signInAuthUserWithEmailAndPassword = async (email, password) => {
 export const signOutUser = async () => await signOut(auth);
 export const onAuthStateChangedListener = (callback) => {
     return onAuthStateChanged(auth, callback);
+};
+
+export const getCurrentUser = () => {
+    return new Promise((resolve, reject) => {
+        const unsubscribe = onAuthStateChanged(
+            auth,
+            (userAuth) => {
+                unsubscribe();
+                resolve(userAuth);
+            },
+            reject
+        );
+    });
 };

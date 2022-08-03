@@ -1,11 +1,10 @@
 import { useState } from "react";
-import {
-    createAuthUserWithEmailAndPassword,
-    creactUserDocumentFromAuth,
-} from "../../utils/firebase/firebase";
+
 import FormInput from "../form-input/form-input";
 import './sign-up-form.scss'
 import Button from "../button/button";
+import { useDispatch } from "react-redux";
+import { signUpStart } from "../../store/user/user.action";
 
 
 const defaultFormFields = {
@@ -16,6 +15,7 @@ const defaultFormFields = {
 };
 
 const SignUpForm = () => {
+    const dispatch=useDispatch()
     const [formFields, setFormFields] = useState(defaultFormFields);
     const { displayName, email, password, confirmPassword } = formFields;
 
@@ -38,15 +38,7 @@ const SignUpForm = () => {
             return;
         }
         try {
-            const { user } = await createAuthUserWithEmailAndPassword(
-                email,
-                password
-            );
-            //捕获创建授权时的错误，如重复使用
-
-
-
-            await creactUserDocumentFromAuth(user,{displayName})
+            dispatch(signUpStart(email,password,displayName))
             resetFormFields()
         } catch (error) {
             if(error.code==='auth/email-already-in-use'){
