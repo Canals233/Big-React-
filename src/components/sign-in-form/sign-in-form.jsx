@@ -82,15 +82,14 @@ const SignInForm = () => {
 
                 <div className="buttons-container">
                     <Button type="submit" onClick={handleSubmit}>
-                        {" "}
                         登录
                     </Button>
                     <Button
                         type={"button"}
-                        buttonType={"google"}
+                        buttonType={"google-sign-in"}
                         onClick={signInWithGoogle}
                     >
-                        用谷歌账户登录
+                        谷歌登录
                     </Button>
                 </div>
             </form>
@@ -100,21 +99,4 @@ const SignInForm = () => {
 
 export default SignInForm;
 
-// const SignUpForm = () => {
-//     return (
-//         <div>
-//             <h1> Sign up with your email and password</h1>
-//             <form onSubmit={()=>{}}>
-//                 <label>Display Name</label>
-//                 <input type='text' required />
-//                 <label>Email</label>
-//                 <input type='email' required />
-//                 <label>Password</label>
-//                 <input type='password' required />
-//                 <label>Confirm PassWord</label>
-//                 <input type='password' required />
-//                 <button type="submit"> Submit</button>
-//             </form>
-//         </div>
-//     );
-// };
+

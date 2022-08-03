@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { selectCartToal } from "../../store/cart/cart.selector";
 import { selectCurrentUser } from "../../store/user/user.selector";
+import { BUTTON_TYPE_CLASSES } from "../button/button";
 
 
 import { PaymentFormContainer, FormContainer, PaymentButton } from "./payment-form.styles";
@@ -63,7 +64,7 @@ const PaymentForm = () => {
             <FormContainer onSubmit={paymentHandler}>
                 <h2>信用卡支付：</h2>
                 <CardElement />
-                <PaymentButton isLoading={isProcessingPayment} buttonType={"inverted"}>
+                <PaymentButton isLoading={isProcessingPayment} buttonType={BUTTON_TYPE_CLASSES.inverted}>
                     现在支付
                 </PaymentButton>
             </FormContainer>
