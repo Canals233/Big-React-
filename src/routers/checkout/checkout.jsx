@@ -1,17 +1,18 @@
-
-
 import CheckoutItem from "../../components/checkout-item/checkout-item";
 
 import "./checkout.scss";
 
 import { useSelector } from "react-redux/es/exports";
-import { selectCartItems, selectCartToal } from "../../store/cart/cart.selector";
+import {
+    selectCartItems,
+    selectCartToal,
+} from "../../store/cart/cart.selector";
 import PaymentForm from "../../components/payment-form/payment-form.component";
+import { memo } from "react";
 
-const Checkout = () => {
-
-    const cartItems=useSelector(selectCartItems)
-    const cartTotal=useSelector(selectCartToal)
+const Checkout = memo(() => {
+    const cartItems = useSelector(selectCartItems);
+    const cartTotal = useSelector(selectCartToal);
     return (
         <div className="checkout-container">
             <div className="checkout-header">
@@ -35,9 +36,9 @@ const Checkout = () => {
                 <CheckoutItem key={cartItem.id} cartItem={cartItem} />
             ))}
             <div className="total">TOTAL: ${cartTotal}</div>
-            <PaymentForm/>
+            <PaymentForm />
         </div>
     );
-};
+});
 
 export default Checkout;

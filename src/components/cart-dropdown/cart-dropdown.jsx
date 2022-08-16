@@ -7,13 +7,16 @@ import CartItem from "../cart-item/cart-item";
 
 import "./cart-dropdown.scss";
 import { selectCartItems } from "../../store/cart/cart.selector";
+import { useCallback } from "react";
 
 const CartDropdown = () => {
     const  cartItems  = useSelector(selectCartItems);
     const navigate=useNavigate();
-    const goToCheckOutHandler=()=>{
+
+
+    const goToCheckOutHandler=useCallback(()=>{
         navigate('/checkout')
-    }
+    },[])
     return (
         <div className="cart-dropdown-container">
             <div className="cart-items">
@@ -26,6 +29,7 @@ const CartDropdown = () => {
                 )}
             </div>
             <Button onClick={goToCheckOutHandler}>去结算</Button>
+            
         </div>
     );
 };
